@@ -68,6 +68,5 @@ plot_circle_packing(cube)
 ```
 ### Authors
 
-Mara Belotti
-Sascha Timme
+Mara Belotti and Sascha Timme
 
