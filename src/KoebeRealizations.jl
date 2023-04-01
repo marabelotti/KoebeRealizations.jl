@@ -2,15 +2,13 @@ module KoebeRealizations
 
 export EuclideanMedialGraph, layout, plot_circle_packing, koebe_realization
 
-using LinearAlgebra
 using ModelingToolkit: @variables, ~, NonlinearSystem, NonlinearProblem
+import Polymake;
 import NonlinearSolve
-import Polymake
-import Plots
+using Plots
 
 """
     vertex_facet_to_incidence(J)
-
 Given a vertex-facet incidence matrix `J` where `J[i,j] == true` if the `i`-th face
 contains the `j`-th vertex, this function returns a matrix `M` with `M[i,j] == true` if
 there is an endge between vertex `i` and `j`.
@@ -50,7 +48,6 @@ rev(cycle) = map(reverse, reverse(cycle))
 
 """
     EuclideanMedialGraph(vertex_facet_incidence)
-
 Given a vertex-facet incidence matrix it constructs the Euclidean medial graph where the
 vertex corresponding to the first edge is removed.
 """
@@ -294,7 +291,7 @@ function layout(G::EuclideanMedialGraph)
         (face_id, level) -> begin
 
             for (i, j) in face_cycles[face_id]
-                haskey(G.oriented_edges, (j, i)) || continue
+                haskey(G.oriented_edges, (j, i)) || continue #this we need to see if it is boundary cycle
                 isnothing(vertex_coords[i]) && isnothing(vertex_coords[j]) && continue
                 next_edge = (i, j)
                 next_face_id = cycle_face_map[(j, i)]
@@ -332,8 +329,39 @@ function layout(G::EuclideanMedialGraph)
             end
             nothing
         end
+    
     # Start recursion
     iterative_layout(1, 0)
+    
+    #We need to verify that we have no-nothing entries
+    
+    limit_count=1
+    limit=length(face_coords)^3
+    while !isempty(findall(x->typeof(x)==Nothing, face_coords)) && limit_count<limit
+        starting_face=0
+        id_face_miss=1
+        
+        while starting_face==0
+            
+            face_miss=findall(x->typeof(x)==Nothing, face_coords)[id_face_miss]
+
+            #we need to find a computed adjacent face w.r.t the i-th one
+
+            for (i, j) in face_cycles[face_miss]
+                haskey(G.oriented_edges, (j, i)) || continue
+                adjacent_face=G.oriented_edges[(j, i)]
+                face_coords[adjacent_face]!=nothing || continue
+                starting_face=adjacent_face
+            end
+            
+            id_face_miss=id_face_miss+1
+        end
+        
+        iterative_layout(starting_face, 0)
+        
+        limit_count+=1
+    end
+    
 
 
     return (
@@ -363,7 +391,6 @@ end
 """
     plot_circle_packing(vertex_facet)
     plot_circle_packing(::EuclideanMedialGraph)
-
 Visualize the (euclidean) circle packing.
 """
 function plot_circle_packing(G::EuclideanMedialGraph; show_vertices = false)
@@ -416,25 +443,41 @@ function point_minimal_distance_sum(tangency_points, G::EuclideanMedialGraph)
     sys = NonlinearSystem(Spring_Functional, x[1:3], [])
 
     while true
-        guess = x[1:3] .=> rand.()
-
-        #I want my guess to be inside the ball
-        while sum(guess[1][2]^2 + guess[2][2]^2 + guess[3][2]^2) > 1
+        
+        try
             guess = x[1:3] .=> rand.()
-        end
 
-        prob = NonlinearProblem(
-            sys,
-            guess,
-            # analytical jacobian
-            jac = true,
-        )
-        res = NonlinearSolve.solve(prob, NonlinearSolve.NewtonRaphson(); tol = 1e-12)
+            #println("I am at first guess")
+            #println(sum(guess[1][2]^2 + guess[2][2]^2 + guess[3][2]^2))
 
-        if sum(res.u .^ 2) < 1
-            return res.u
+            #I want my guess to be inside the ball
+            while sum(guess[1][2]^2 + guess[2][2]^2 + guess[3][2]^2) >= 1
+                guess = x[1:3] .=> rand.()
+                #println("Wrong guess repeating")
+                #println(sum(guess[1][2]^2 + guess[2][2]^2 + guess[3][2]^2))
+            end
+
+            prob = NonlinearProblem(
+                sys,
+                guess,
+                # analytical jacobian
+                jac = true,
+            )
+
+            #println("Solving")
+            res = NonlinearSolve.solve(prob, NonlinearSolve.NewtonRaphson(); tol = 1e-12)
+            #println(sum(res.u .^ 2))
+
+            if sum(res.u .^ 2) < 1
+                #println("Verification of norm")
+                return res.u
+            end
+            
+        catch err
+            println("There was a singular exception but I handled it")
         end
     end
+    
 end
 
 function projective_transformation(tangency_points, G::EuclideanMedialGraph)
@@ -472,7 +515,6 @@ function projective_transformation(tangency_points, G::EuclideanMedialGraph)
 end
 
 """
-
 """
 function koebe_realization(G::EuclideanMedialGraph)
     vertex_coordinates, face_coordinates, face_radii = layout(G)
@@ -504,10 +546,10 @@ end
 function koebe_realization(vertex_facet::AbstractMatrix)
     koebe_realization(EuclideanMedialGraph(vertex_facet))
 end
+
 function koebe_realization(poly::Polymake.BigObject)
     pts = koebe_realization(poly.VERTICES_IN_FACETS)
     Polymake.polytope.Polytope(; POINTS = [ones(size(pts, 1), 1) pts])
 end
-
 
 end # module
