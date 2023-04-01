@@ -6,7 +6,7 @@ Computes a Koebe realization of a 3-dimensional polytope following [Variational 
 
 ```julia
 using Pkg
-pkg"add https://github.com/saschatimme/KoebeRealizations.jl.git"
+pkg"add https://github.com/marabelotti/KoebeRealizations.jl.git"
 ```
 
 
