@@ -1,6 +1,7 @@
 # Koebe Realizations
 
-Computes a Koebe realization of a 3-dimensional polytope following [Variational principles for circle patterns and Koebe's theorem](https://arxiv.org/abs/math/0203250). The input is the vertex-facet description of a polytope.
+This code computes a Koebe realization of a 3-dimensional polytope following [Variational principles for circle patterns and Koebe's theorem](https://arxiv.org/abs/math/0203250), which we call Koebe realization. 
+This implementation is motivated by the paper [Algebraic Degrees of 3-Dimensional Polytopes](https://link.springer.com/article/10.1007/s10013-022-00559-2), of which Mara Belotti is one of the authors.
 
 ## Installation
 
@@ -65,3 +66,8 @@ cube = Bool[
 ]
 plot_circle_packing(cube)
 ```
+### Authors
+
+Mara Belotti
+Sascha Timme
+
