@@ -1,7 +1,7 @@
 # Koebe Realizations
 
 This code computes the realization of a 3-dimensional polytope following [Variational principles for circle patterns and Koebe's theorem](https://arxiv.org/abs/math/0203250), which we call a Koebe realization. 
-This implementation is motivated by the paper [Algebraic Degrees of 3-Dimensional Polytopes](https://link.springer.com/article/10.1007/s10013-022-00559-2), of which Mara Belotti is one of the authors.
+This implementation is motivated by the paper [Algebraic Degrees of 3-Dimensional Polytopes](https://link.springer.com/article/10.1007/s10013-022-00559-2)
 
 ## Installation
 
