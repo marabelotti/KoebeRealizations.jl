@@ -13,4 +13,6 @@ Polymake = "d720cf60-89b5-51f5-aff5-213f193123e7"
 [compat]
 ModelingToolkit = "5.16.0"
 NonlinearSolve = "0.3.8"
+Plots= "1.12.0"
+Polymake="0.9.0"
 
