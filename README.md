@@ -59,9 +59,11 @@ visual(K, FacetColor="0.54 0.17 0.89", VertexColor= "0.54 0.17 0.89", FacetTrans
     <img src="johnson_solid_73.png" width="200">
 </p>
 
-## Example 3: The Circle Packing
+## Visualizing the circle packing
 
-Underneath, the algorithm to compute the realization computes a particular circle packing. This can be visualized as follows:
+We can naturally associate to the realization a circle packing on the sphere by considering, for every vertex, the circle passing through the tangency points of the edges containing that vertex. 
+
+This can be visualized, together with its dual, as follows:
 
 ```julia
 using KoebeRealizations
