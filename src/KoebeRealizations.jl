@@ -401,7 +401,7 @@ function plot_circle_packing(G::EuclideanMedialGraph; show_vertices = false)
     for (pt, r, k) in zip(face_coords[ind], face_radii[ind], ind)
         isnothing(pt) && continue
         (x, y) = pt
-        color = is_vertex_face(G, k) ? :indianred : :dodgerblue
+        color = is_vertex_face(G, k) ? RGB(0.54,0.17,0.89) : RGB(0.6,0.8,0)
         draw_circle!(p, x, y, r; color = color)
     end
     if show_vertices
@@ -410,8 +410,12 @@ function plot_circle_packing(G::EuclideanMedialGraph; show_vertices = false)
     end
     p
 end
-function plot_circle_packing(vertex_facet)
+function plot_circle_packing(vertex_facet::AbstractMatrix)
     plot_circle_packing(EuclideanMedialGraph(vertex_facet))
+end
+
+function plot_circle_packing(poly::Polymake.BigObject)
+    plot_circle_packing(poly.VERTICES_IN_FACETS)
 end
 
 # 2D -> 3D
